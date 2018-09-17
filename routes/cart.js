@@ -1,5 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
+const debug = require('debug')('app:cart');
 const router = express.Router();
 
 const carts = [
@@ -30,10 +31,12 @@ const promos = [
 ];
 
 router.get('/', (req, res) => {
+    debug('Getting all the carts!!');
     res.send(carts);
 });
 
 router.get('/:id', (req, res) => {
+    debug('Getting cart items!!');
     const cartItem = carts.find(c => c.id === parseInt(req.params.id));
     if (!cartItem) return res.status(404).send('Cart could not be found!!!');
     res.send(cartItem);
@@ -49,6 +52,7 @@ router.post('/', (req, res) => {
         name: req.body.name
     };
     carts.push(cartItem);
+    debug('Adding new cart:', cartItem);
     res.send(cartItem);
 });
 
@@ -67,6 +71,8 @@ router.put('/addToCart/:id', (req, res) => {
 
     cart.items.push(cartItem);
 
+    debug('Adding new item to cart:', cart);
+
     res.send(cart);
 });
 
@@ -79,11 +85,13 @@ router.get('/mergeCart/:cartId1/:cartId2', (req, res) => {
     if (!cart2) return res.status(404).send('Cart2 not found!!');
 
     const final = cart1.items.concat(cart2.items);
+    
+    debug('Merged two cart items:', final);
 
     res.send(final);
 });
 
-router.put('/removeItemfromCart/:itemId/:id', (req, res) => {
+router.delete('/removeItemfromCart/:itemId/:id', (req, res) => {
 
     const cart = carts.find(c => c.id === parseInt(req.params.id));
     if (!cart) return res.status(404).send('Cart not found!!');
@@ -93,6 +101,8 @@ router.put('/removeItemfromCart/:itemId/:id', (req, res) => {
 
     const index = cart.items.indexOf(item);
     cart.items.splice(index, 1);
+    
+    debug('Removing item from cart:', item);
 
     res.send(item);
 });
@@ -114,6 +124,7 @@ function validateItem(cartItem) {
     const schema = {
         itemName: Joi.string().min(4).required()
     };
+    debug('Validating item schema!!');
     return Joi.validate(cartItem, schema);
 }
 
