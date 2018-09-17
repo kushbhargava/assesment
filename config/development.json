@@ -1,0 +1,6 @@
+{
+    "name": "My Cart app - development",
+    "mail": {
+        "host": "dev-mail-server"
+    }
+}
